@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D4E624DD193AEC6000B61FC4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4E624DC193AEC6000B61FC4 /* main.cpp */; };
 		D4E624DF193AEC6000B61FC4 /* Foldex.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D4E624DE193AEC6000B61FC4 /* Foldex.1 */; };
+		D4E624F3193AFBE800B61FC4 /* pbx_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4E624F1193AFBE800B61FC4 /* pbx_parser.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,9 @@
 		D4E624D9193AEC6000B61FC4 /* Foldex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Foldex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4E624DC193AEC6000B61FC4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D4E624DE193AEC6000B61FC4 /* Foldex.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Foldex.1; sourceTree = "<group>"; };
+		D4E624F0193AF8C700B61FC4 /* structs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = structs.hpp; sourceTree = "<group>"; };
+		D4E624F1193AFBE800B61FC4 /* pbx_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pbx_parser.cpp; sourceTree = "<group>"; };
+		D4E624F2193AFBE800B61FC4 /* pbx_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pbx_parser.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +64,9 @@
 		D4E624DB193AEC6000B61FC4 /* Foldex */ = {
 			isa = PBXGroup;
 			children = (
+				D4E624F0193AF8C700B61FC4 /* structs.hpp */,
+				D4E624F2193AFBE800B61FC4 /* pbx_parser.h */,
+				D4E624F1193AFBE800B61FC4 /* pbx_parser.cpp */,
 				D4E624DC193AEC6000B61FC4 /* main.cpp */,
 				D4E624DE193AEC6000B61FC4 /* Foldex.1 */,
 			);
@@ -117,6 +124,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4E624F3193AFBE800B61FC4 /* pbx_parser.cpp in Sources */,
 				D4E624DD193AEC6000B61FC4 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -57,6 +57,12 @@
             ReferencedContainer = "container:Foldex.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Users/bronenos/Documents/Development/Foldex/Agent/agent/Agent.xcodeproj/project.pbxproj"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
