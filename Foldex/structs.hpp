@@ -62,10 +62,27 @@ public:
 		object_version = 0;
 	}
 	
-	object_t* object_by_id(string id) {
+	object_map_t* objects() {
 		object_map_t *root = dynamic_cast<object_map_t*>(child);
 		object_map_t *objects = dynamic_cast<object_map_t*>(root->children["objects"]);
-		return objects->children[id];
+		return objects;
+	}
+	
+	object_t* object_by_id(string id) {
+		return objects()->children[id];
+	}
+	
+	vector<object_t*> objects_by_isa(string isa) {
+		vector<object_t*> ret;
+		
+		for (auto it : objects()->children) {
+			object_map_t *info = dynamic_cast<object_map_t*>(it.second);
+			if (info->fields["isa"] == isa) {
+				ret.push_back(info);
+			}
+		}
+		
+		return ret;
 	}
 	
 public:

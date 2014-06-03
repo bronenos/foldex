@@ -8,10 +8,10 @@
 
 #include <stdlib.h>
 #include <cstdio>
-#include "pbx_parser.h"
+#include "pbx_reader.h"
 
 
-pbx_parser::pbx_parser(string filepath)
+pbx_reader::pbx_reader(string filepath)
 {
 	FILE *fp = fopen(filepath.c_str(), "r");
 	if (fp) {
@@ -31,7 +31,7 @@ pbx_parser::pbx_parser(string filepath)
 	}
 }
 
-project_t* pbx_parser::parse()
+project_t* pbx_reader::parse()
 {
 	string comment = parse_project_comment();
 	object_map_t *obj = dynamic_cast<object_map_t *>(parse_child());
@@ -46,7 +46,7 @@ project_t* pbx_parser::parse()
 	return proj;
 }
 
-string pbx_parser::parse_project_comment()
+string pbx_reader::parse_project_comment()
 {
 	const char *key_begin = step_get();
 	const char *key_end = strstr(step_get(), "{");
@@ -57,7 +57,7 @@ string pbx_parser::parse_project_comment()
 	return ret;
 }
 
-object_t* pbx_parser::parse_child()
+object_t* pbx_reader::parse_child()
 {
 	if (*step_get() == '{') {
 		step_forward();
@@ -151,7 +151,7 @@ object_t* pbx_parser::parse_child()
 	return NULL;
 }
 
-//string pbx_parser::remove_comments(string data)
+//string pbx_reader::remove_comments(string data)
 //{
 //	string ret;
 //	
@@ -179,7 +179,7 @@ object_t* pbx_parser::parse_child()
 //	return ret;
 //}
 
-const char* pbx_parser::find_equal()
+const char* pbx_reader::find_equal()
 {
 	while (*step_get() != '=') {
 		step_forward();
@@ -188,7 +188,7 @@ const char* pbx_parser::find_equal()
 	return step_get();
 }
 
-const char* pbx_parser::find_value()
+const char* pbx_reader::find_value()
 {
 	step_set(strchr(step_get(), '='));
 	step_forward();
@@ -196,7 +196,7 @@ const char* pbx_parser::find_value()
 	return step_get();
 }
 
-const char* pbx_parser::find_quote()
+const char* pbx_reader::find_quote()
 {
 	while (true) {
 		if (*step_get() != '"') {
@@ -215,7 +215,7 @@ const char* pbx_parser::find_quote()
 	return step_get();
 }
 
-const char* pbx_parser::find_non_alphadigit()
+const char* pbx_reader::find_non_alphadigit()
 {
 	while (is_valid_path(step_get())) {
 		step_forward();
@@ -224,7 +224,7 @@ const char* pbx_parser::find_non_alphadigit()
 	return step_get();
 }
 
-const char* pbx_parser::find_delimiter()
+const char* pbx_reader::find_delimiter()
 {
 	const char *end = _data.data() + _data.length();
 	const char *delimiters = _container_type.top() ? ";}" : ",)";
@@ -244,34 +244,34 @@ const char* pbx_parser::find_delimiter()
 	return step_get();
 }
 
-void pbx_parser::step_set(const char *it)
+void pbx_reader::step_set(const char *it)
 {
 	_it = it;
 }
 
-const char* pbx_parser::step_get()
+const char* pbx_reader::step_get()
 {
 	return _it;
 }
 
-const char pbx_parser::step_get_char()
+const char pbx_reader::step_get_char()
 {
 	return *step_get();
 }
 
-void pbx_parser::step_forward()
+void pbx_reader::step_forward()
 {
 	_it++;
 }
 
-void pbx_parser::skip_space()
+void pbx_reader::skip_space()
 {
 	while (isspace(step_get_char())) {
 		step_forward();
 	}
 }
 
-void pbx_parser::skip_comment()
+void pbx_reader::skip_comment()
 {
 	static const char *comment_begin	= "/*";
 	static const char *comment_end		= "*/";
@@ -282,14 +282,14 @@ void pbx_parser::skip_comment()
 	}
 }
 
-void pbx_parser::skip_space_and_comment()
+void pbx_reader::skip_space_and_comment()
 {
 	skip_space();
 	skip_comment();
 	skip_space();
 }
 
-void pbx_parser::skip_optional_delimiter()
+void pbx_reader::skip_optional_delimiter()
 {
 	const char c = _container_type.top() ? ';' : ',';
 	
@@ -298,7 +298,7 @@ void pbx_parser::skip_optional_delimiter()
 	}
 }
 
-string pbx_parser::parse_key()
+string pbx_reader::parse_key()
 {
 	const char *key_begin = step_get();
 	const char *key_end = find_non_alphadigit();
@@ -307,13 +307,13 @@ string pbx_parser::parse_key()
 	return key;
 }
 
-string pbx_parser::parse_int()
+string pbx_reader::parse_int()
 {
 	int32_t number = atoi(step_get());
 	return to_string(number);
 }
 
-string pbx_parser::parse_string()
+string pbx_reader::parse_string()
 {
 	const char c = *step_get();
 	if (c == '"') {
@@ -334,7 +334,7 @@ string pbx_parser::parse_string()
 	return string();
 }
 
-bool pbx_parser::is_valid_path(const char *c)
+bool pbx_reader::is_valid_path(const char *c)
 {
 	if (*c == 0x00) {
 		return false;

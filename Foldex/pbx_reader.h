@@ -6,18 +6,15 @@
 //  Copyright (c) 2014 bronenos. All rights reserved.
 //
 
-#ifndef __Foldex__parser__
-#define __Foldex__parser__
-
 #include <string>
 #include <stack>
 #include "structs.hpp"
 using namespace std;
 
 
-class pbx_parser {
+class pbx_reader {
 public:
-	pbx_parser(string filepath);
+	pbx_reader(string filepath);
 	project_t* parse();
 	
 private:
@@ -51,6 +48,3 @@ private:
 	const char *_it;
 	stack<bool> _container_type;
 };
-
-
-#endif /* defined(__Foldex__parser__) */

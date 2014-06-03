@@ -7,18 +7,42 @@
 //
 
 #include <iostream>
-#include "pbx_parser.h"
+#include "pbx_processer.h"
+
+
+enum {
+	kFoldexArgSelfPath,
+	kFoldexArgProjectPath,
+	kFoldexArgNewFolderPath,
+	kFoldexArg_Count,
+};
 
 
 int main(int argc, const char * argv[])
 {
-	if (argc < 2) {
-		std::cout << "You have to specify the project's filepath";
+	if (argc < kFoldexArg_Count) {
+		std::cout << "Usage:" << endl;
+		std::cout << "foldex (path_to_xcodeproj_file) (path_to_new_project_folder)" << endl;
 		return 0;
 	}
 	
-	pbx_parser parser(argv[1]);
-	parser.parse();
+	const char *project_path = argv[kFoldexArgProjectPath];
+	const char *internal_path = "/project.pbxproj";
+	const char *new_folder_path = argv[kFoldexArgNewFolderPath];
+	
+	char *path = new char[strlen(project_path) + strlen(internal_path) + 1];
+	if (path) {
+		strcpy(path, project_path);
+		strcat(path, internal_path);
+		
+		project_t *parser = pbx_reader(path).parse();
+		if (parser) {
+			pbx_processer proc(parser);
+			proc.process(project_path, new_folder_path);
+		}
+		
+		delete[] path;
+	}
 	
     return 0;
 }

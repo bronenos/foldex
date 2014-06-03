@@ -59,7 +59,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/bronenos/Documents/Development/Foldex/Agent/agent/Agent.xcodeproj/project.pbxproj"
+            argument = "/Users/bronenos/Documents/Development/Foldex/Agent/agent/Agent.xcodeproj"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/bronenos/Desktop/_agent"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
