@@ -29,21 +29,29 @@ pbx_reader::pbx_reader(string filepath)
 		
 		step_set(_data.data());
 	}
+	else {
+		step_set(nullptr);
+	}
 }
 
 project_t* pbx_reader::parse()
 {
-	string comment = parse_project_comment();
-	object_map_t *obj = dynamic_cast<object_map_t *>(parse_child());
-	
-	project_t *proj = new project_t;
-	proj->comment = comment;
-	proj->archive_version = atoi(obj->fields["archiveVersion"].c_str());
-	proj->object_version = atoi(obj->fields["objectVersion"].c_str());
-	proj->child = obj;
-	proj->rootRef = obj->fields["rootObject"];
-	
-	return proj;
+	if (step_get()) {
+		string comment = parse_project_comment();
+		object_map_t *obj = dynamic_cast<object_map_t *>(parse_child());
+		
+		project_t *proj = new project_t;
+		proj->comment = comment;
+		proj->archive_version = obj->fields["archiveVersion"];
+		proj->object_version = obj->fields["objectVersion"];
+		proj->rootRef = obj->fields["rootObject"];
+		proj->child = obj->children["objects"];
+		
+		return proj;
+	}
+	else {
+		return nullptr;
+	}
 }
 
 string pbx_reader::parse_project_comment()
@@ -63,14 +71,20 @@ object_t* pbx_reader::parse_child()
 		step_forward();
 		
 		object_map_t *obj = new object_map_t;
-		_container_type.push(true);
+		_container_type.push(kPBXContainerTypeDictionary);
 		
 		while (true) {
 			skip_space_and_comment();
 			
 			string key;
-			if (isalpha(step_get_char()) || isdigit(step_get_char())) {
-				key = parse_key();
+			if (step_get_char() == '"') {
+				key = parse_string();
+				
+				skip_space_and_comment();
+				find_delimiter();
+			}
+			else if (is_valid_path(step_get())) {
+				key = parse_string();
 				
 				skip_space_and_comment();
 				find_value();
@@ -111,7 +125,7 @@ object_t* pbx_reader::parse_child()
 		step_forward();
 		
 		object_array_t *obj = new object_array_t;
-		_container_type.push(false);
+		_container_type.push(kPBXContainerTypeArray);
 		
 		while (true) {
 			skip_space_and_comment();
@@ -148,36 +162,8 @@ object_t* pbx_reader::parse_child()
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
-
-//string pbx_reader::remove_comments(string data)
-//{
-//	string ret;
-//	
-//	const char *c_str = data.c_str();
-//	const char *begin = c_str;
-//	string::size_type idx_begin = 0;
-//	
-//	while (true) {
-//		idx_begin = data.find("/*", idx_begin);
-//		if (idx_begin != string::npos) {
-//			ret += string(begin, idx_begin - (begin - c_str));
-//		}
-//		else {
-//			ret += string(begin, c_str + data.length() - begin);
-//			break;
-//		}
-//		
-//		string::size_type idx_end = data.find("*/", idx_begin);
-//		if (idx_end != string::npos) {
-//			begin = c_str + idx_end + 2;
-//			idx_begin = begin - c_str;
-//		}
-//	}
-//	
-//	return ret;
-//}
 
 const char* pbx_reader::find_equal()
 {
@@ -227,7 +213,7 @@ const char* pbx_reader::find_non_alphadigit()
 const char* pbx_reader::find_delimiter()
 {
 	const char *end = _data.data() + _data.length();
-	const char *delimiters = _container_type.top() ? ";}" : ",)";
+	const char *delimiters = delimiters_for_current_container();
 	
 	while (true) {
 		if (step_get() == end) {
@@ -291,20 +277,9 @@ void pbx_reader::skip_space_and_comment()
 
 void pbx_reader::skip_optional_delimiter()
 {
-	const char c = _container_type.top() ? ';' : ',';
-	
-	if (step_get_char() == c) {
+	if (step_get_char() == delimiters_for_current_container()[0]) {
 		step_forward();
 	}
-}
-
-string pbx_reader::parse_key()
-{
-	const char *key_begin = step_get();
-	const char *key_end = find_non_alphadigit();
-	
-	string key = string(key_begin, key_end - key_begin);
-	return key;
 }
 
 string pbx_reader::parse_int()
@@ -332,6 +307,16 @@ string pbx_reader::parse_string()
 	}
 	
 	return string();
+}
+
+const char* pbx_reader::delimiters_for_current_container()
+{
+	switch (_container_type.top()) {
+		case kPBXContainerTypeArray:		return ",)";
+		case kPBXContainerTypeDictionary:	return ";}";
+	}
+	
+	return nullptr;
 }
 
 bool pbx_reader::is_valid_path(const char *c)

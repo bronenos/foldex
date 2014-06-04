@@ -58,13 +58,10 @@ public:
 class project_t {
 public:
 	project_t() {
-		archive_version = 0;
-		object_version = 0;
 	}
 	
 	object_map_t* objects() {
-		object_map_t *root = dynamic_cast<object_map_t*>(child);
-		object_map_t *objects = dynamic_cast<object_map_t*>(root->children["objects"]);
+		object_map_t *objects = dynamic_cast<object_map_t*>(child);
 		return objects;
 	}
 	
@@ -87,8 +84,9 @@ public:
 	
 public:
 	string comment;
-	uint8_t archive_version;
-	uint8_t object_version;
+	string archive_version;
+	string object_version;
+	object_map_t classes;
 	object_t *child;
 	string rootRef;
 };

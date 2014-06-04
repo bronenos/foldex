@@ -12,6 +12,12 @@
 using namespace std;
 
 
+enum kPBXContainerType {
+	kPBXContainerTypeArray,
+	kPBXContainerTypeDictionary,
+};
+
+
 class pbx_reader {
 public:
 	pbx_reader(string filepath);
@@ -37,14 +43,14 @@ private:
 	void skip_space_and_comment();
 	void skip_optional_delimiter();
 	
-	string parse_key();
 	string parse_int();
 	string parse_string();
 	
+	const char* delimiters_for_current_container();
 	bool is_valid_path(const char *c);
 	
 private:
 	string _data;
 	const char *_it;
-	stack<bool> _container_type;
+	stack<kPBXContainerType> _container_type;
 };

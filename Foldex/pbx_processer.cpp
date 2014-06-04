@@ -18,21 +18,23 @@ pbx_processer::pbx_processer(project_t *project)
 
 void pbx_processer::process(string old_base, string new_base)
 {
-	vector<object_t *> project_list = _project->objects_by_isa("PBXProject");
-	for (auto project : project_list) {
-		string main_group_id = dynamic_cast<object_map_t*>(project)->fields["mainGroup"];
-		recursive_build(main_group_id, true);
-	}
-	
 	_old_project_path = old_base;
 	_old_base = path_without_last_component(_old_project_path, false);
 	_new_base = new_base;
 	
+	process_build_configs();
+	
+	vector<object_t *> project_list = _project->objects_by_isa("PBXProject");
+	for (auto project : project_list) {
+		string main_group_id = dynamic_cast<object_map_t*>(project)->fields["mainGroup"];
+		process_recursive(main_group_id, true);
+	}
+	
 	rename_files();
-	move_project();
+	move_project_file();
 }
 
-void pbx_processer::recursive_build(string id, bool is_main)
+void pbx_processer::process_recursive(string id, bool is_main)
 {
 	object_t *object = _project->object_by_id(id);
 	
@@ -50,7 +52,7 @@ void pbx_processer::recursive_build(string id, bool is_main)
 void pbx_processer::process_group(object_map_t *group, bool is_main)
 {
 	string path = group->fields["path"];
-	string name = group->fields["name"];
+	string name = group->fields["name"].length() ? group->fields["name"] : path;
 	
 	if (group->fields["sourceTree"] == "SOURCE_ROOT") {
 		path.insert(0, "/");
@@ -59,11 +61,15 @@ void pbx_processer::process_group(object_map_t *group, bool is_main)
 	if (is_main == false) {
 		_old_path.push_back(path);
 		_new_path.push_back(name);
+		
+		group->fields["sourceTree"] = "<group>";
+		group->fields["path"] = _new_path.back();
+		group->fields.erase("name");
 	}
 	
 	object_array_t *children = dynamic_cast<object_array_t*>(group->children["children"]);
 	for (auto child_id : children->fields) {
-		recursive_build(child_id, false);
+		process_recursive(child_id, false);
 	}
 	
 	if (is_main == false) {
@@ -92,16 +98,42 @@ void pbx_processer::process_file(object_map_t *file)
 		string new_path = build_path(_new_path);
 		_renames[old_path] = new_path;
 		
-//		printf("move %s to %s\n", old_path.c_str(), new_path.c_str());
+		file->fields["sourceTree"] = "<group>";
+		file->fields["name"] = _new_path.back();
+		file->fields.erase("path");
 	}
 	
 	_old_path.pop_back();
 	_new_path.pop_back();
 }
 
+void pbx_processer::process_build_configs()
+{
+	vector<object_t*> config_list = _project->objects_by_isa("XCBuildConfiguration");
+	for (auto it : config_list) {
+		object_map_t *config = dynamic_cast<object_map_t*>(it);
+		object_map_t *settings = dynamic_cast<object_map_t*>(config->children["buildSettings"]);
+		if (settings) {
+			string path = string("/") + settings->fields["GCC_PREFIX_HEADER"];
+			if (path.length()) {
+				_old_path.push_back(path);
+				_new_path.push_back(path);
+				
+				string old_path = build_path(_old_path);
+				string new_path = build_path(_new_path);
+				_renames[old_path] = new_path;
+				
+				_old_path.pop_back();
+				_new_path.pop_back();
+			}
+		}
+	}
+}
+
+
 bool pbx_processer::is_isa(object_t *object, string isa)
 {
-	if (object == NULL) {
+	if (object == nullptr) {
 		return false;
 	}
 	
@@ -115,8 +147,8 @@ bool pbx_processer::is_isa(object_t *object, string isa)
 
 string pbx_processer::path_without_last_component(string path, bool with_delimiter)
 {
-	if (path.length() < 2) {
-		return string();
+	if (path.length() == 0) {
+		return "../";
 	}
 	
 	string::size_type idx = path.rfind("/", path.length() - 2);
@@ -156,6 +188,11 @@ string pbx_processer::build_path(vector<string> &path)
 
 void pbx_processer::rename_files()
 {
+	if (system(nullptr) == 0) {
+		printf("%s\n", "Unlucky, the command processor is not available for unknown reason.\nSorry.\n");
+		return;
+	}
+	
 	vector<string> not_exist;
 	
 	for (auto it : _renames) {
@@ -182,7 +219,7 @@ void pbx_processer::rename_files()
 	}
 }
 
-void pbx_processer::move_project()
+void pbx_processer::move_project_file()
 {
 	sprintf(_cmd, "cp -af \"%s\" \"%s\"", _old_project_path.c_str(), _new_base.c_str());
 	system(_cmd);

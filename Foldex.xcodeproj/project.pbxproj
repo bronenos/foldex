@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D414127E193E40CA00DF1A11 /* pbx_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D414127C193E40CA00DF1A11 /* pbx_writer.cpp */; };
 		D4458CF9193C8E8D00768EB7 /* pbx_processer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4458CF7193C8E8D00768EB7 /* pbx_processer.cpp */; };
 		D4E624DD193AEC6000B61FC4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D4E624DC193AEC6000B61FC4 /* main.cpp */; };
 		D4E624DF193AEC6000B61FC4 /* Foldex.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D4E624DE193AEC6000B61FC4 /* Foldex.1 */; };
@@ -27,6 +28,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D414127C193E40CA00DF1A11 /* pbx_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pbx_writer.cpp; sourceTree = "<group>"; };
+		D414127D193E40CA00DF1A11 /* pbx_writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pbx_writer.h; sourceTree = "<group>"; };
 		D4458CF7193C8E8D00768EB7 /* pbx_processer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pbx_processer.cpp; sourceTree = "<group>"; };
 		D4458CF8193C8E8D00768EB7 /* pbx_processer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pbx_processer.h; sourceTree = "<group>"; };
 		D4E624D9193AEC6000B61FC4 /* Foldex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Foldex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,6 +75,8 @@
 				D4E624F1193AFBE800B61FC4 /* pbx_reader.cpp */,
 				D4458CF8193C8E8D00768EB7 /* pbx_processer.h */,
 				D4458CF7193C8E8D00768EB7 /* pbx_processer.cpp */,
+				D414127D193E40CA00DF1A11 /* pbx_writer.h */,
+				D414127C193E40CA00DF1A11 /* pbx_writer.cpp */,
 				D4E624DC193AEC6000B61FC4 /* main.cpp */,
 				D4E624DE193AEC6000B61FC4 /* Foldex.1 */,
 			);
@@ -130,6 +135,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4E624F3193AFBE800B61FC4 /* pbx_reader.cpp in Sources */,
+				D414127E193E40CA00DF1A11 /* pbx_writer.cpp in Sources */,
 				D4E624DD193AEC6000B61FC4 /* main.cpp in Sources */,
 				D4458CF9193C8E8D00768EB7 /* pbx_processer.cpp in Sources */,
 			);
