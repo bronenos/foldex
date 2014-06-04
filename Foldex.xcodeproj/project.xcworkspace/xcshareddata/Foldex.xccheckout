@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>8F4FAF7B-373C-43DE-8523-6A823953C7F5</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Foldex</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E8142174-86C9-43A3-8C43-2C70CFCE9BEE</key>
+		<string>https://github.com/bronenos/foldex.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Foldex.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E8142174-86C9-43A3-8C43-2C70CFCE9BEE</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/bronenos/foldex.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E8142174-86C9-43A3-8C43-2C70CFCE9BEE</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E8142174-86C9-43A3-8C43-2C70CFCE9BEE</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Foldex</string>
+		</dict>
+	</array>
+</dict>
+</plist>
