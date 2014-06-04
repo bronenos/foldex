@@ -17,18 +17,10 @@ pbx_writer::pbx_writer(project_t *project)
 
 void pbx_writer::write(string filepath)
 {
-	object_map_t map;
-	map.fields["archiveVersion"] = _project->archive_version;
-	map.fields["objectVersion"] = _project->object_version;
-	map.fields["rootObject"] = _project->rootRef;
-	map.fields["archiveVersion"] = _project->archive_version;
-	map.children["classes"] = &_project->classes;
-	map.children["objects"] = _project->child;
-	
 	FILE *fp = fopen(filepath.c_str(), "w");
 	if (fp) {
 		_depth = 0;
-		string data = _project->comment + data_for_offset() + data_for_object(&map);
+		string data = _project->comment + data_for_offset() + data_for_object(_project->root);
 		
 		fwrite(data.c_str(), data.length(), 1, fp);
 		fclose(fp);
@@ -60,15 +52,12 @@ string pbx_writer::data_for_array_object(object_array_t *object)
 	ret += string() + "(" + data_for_newline();
 	
 	for (auto it : object->fields) {
-		if (it.length() == 0) {
-			continue;
+		if (it.object) {
+			ret += data_for_object(it.object) + "," + data_for_newline();
 		}
-		
-		ret += data_for_string(it) + "," + data_for_newline();
-	}
-	
-	for (auto it : object->children) {
-		ret += data_for_object(it) + "," + data_for_newline();
+		else if (it.value.length()) {
+			ret += data_for_string(it.value) + "," + data_for_newline();
+		}
 	}
 	
 	ret.replace(ret.length() - 1, 1, "");
@@ -87,15 +76,12 @@ string pbx_writer::data_for_map_object(object_map_t *object)
 	ret += string() + "{" + data_for_newline();
 	
 	for (auto it : object->fields) {
-		if (it.second.length() == 0) {
-			continue;
+		if (it.second.object) {
+			ret += it.first + " = " + data_for_object(it.second.object) + ";" + data_for_newline();
 		}
-		
-		ret += it.first + " = " + data_for_string(it.second) + ";" + data_for_newline();
-	}
-	
-	for (auto it : object->children) {
-		ret += it.first + " = " + data_for_object(it.second) + ";" + data_for_newline();
+		else if (it.second.value.length()) {
+			ret += it.first + " = " + data_for_string(it.second.value) + ";" + data_for_newline();
+		}
 	}
 	
 	ret.replace(ret.length() - 1, 1, "");

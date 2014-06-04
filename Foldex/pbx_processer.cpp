@@ -26,7 +26,7 @@ void pbx_processer::process(string old_base, string new_base)
 	
 	vector<object_t *> project_list = _project->objects_by_isa("PBXProject");
 	for (auto project : project_list) {
-		string main_group_id = dynamic_cast<object_map_t*>(project)->fields["mainGroup"];
+		string main_group_id = dynamic_cast<object_map_t*>(project)->fields["mainGroup"].value;
 		process_recursive(main_group_id, true);
 	}
 	
@@ -51,10 +51,10 @@ void pbx_processer::process_recursive(string id, bool is_main)
 
 void pbx_processer::process_group(object_map_t *group, bool is_main)
 {
-	string path = group->fields["path"];
-	string name = group->fields["name"].length() ? group->fields["name"] : path;
+	string path = group->fields["path"].value;
+	string name = group->fields["name"].value.length() ? group->fields["name"].value : path;
 	
-	if (group->fields["sourceTree"] == "SOURCE_ROOT") {
+	if (group->fields["sourceTree"].value == "SOURCE_ROOT") {
 		path.insert(0, "/");
 	}
 	
@@ -62,14 +62,14 @@ void pbx_processer::process_group(object_map_t *group, bool is_main)
 		_old_path.push_back(path);
 		_new_path.push_back(name);
 		
-		group->fields["sourceTree"] = "<group>";
-		group->fields["path"] = _new_path.back();
+		group->fields["sourceTree"].value = "<group>";
+		group->fields["path"].value = _new_path.back();
 		group->fields.erase("name");
 	}
 	
-	object_array_t *children = dynamic_cast<object_array_t*>(group->children["children"]);
+	object_array_t *children = dynamic_cast<object_array_t*>(group->fields["children"].object);
 	for (auto child_id : children->fields) {
-		process_recursive(child_id, false);
+		process_recursive(child_id.value, false);
 	}
 	
 	if (is_main == false) {
@@ -80,17 +80,17 @@ void pbx_processer::process_group(object_map_t *group, bool is_main)
 
 void pbx_processer::process_file(object_map_t *file)
 {
-	string path = file->fields["path"];
-	string name = file->fields["name"];
+	string path = file->fields["path"].value;
+	string name = file->fields["name"].value;
 	
 	_old_path.push_back(path.length() ? path : name);
 	_new_path.push_back(name.length() ? name : path);
 	
 	string old_path;
-	if (file->fields["sourceTree"] == "<group>") {
+	if (file->fields["sourceTree"].value == "<group>") {
 		old_path = build_path(_old_path);
 	}
-	else if (file->fields["sourceTree"] == "SOURCE_ROOT") {
+	else if (file->fields["sourceTree"].value == "SOURCE_ROOT") {
 		old_path = path;
 	}
 	
@@ -98,8 +98,8 @@ void pbx_processer::process_file(object_map_t *file)
 		string new_path = build_path(_new_path);
 		_renames[old_path] = new_path;
 		
-		file->fields["sourceTree"] = "<group>";
-		file->fields["name"] = _new_path.back();
+		file->fields["sourceTree"].value = "<group>";
+		file->fields["name"].value = _new_path.back();
 		file->fields.erase("path");
 	}
 	
@@ -112,9 +112,9 @@ void pbx_processer::process_build_configs()
 	vector<object_t*> config_list = _project->objects_by_isa("XCBuildConfiguration");
 	for (auto it : config_list) {
 		object_map_t *config = dynamic_cast<object_map_t*>(it);
-		object_map_t *settings = dynamic_cast<object_map_t*>(config->children["buildSettings"]);
+		object_map_t *settings = dynamic_cast<object_map_t*>(config->fields["buildSettings"].object);
 		if (settings) {
-			string path = string("/") + settings->fields["GCC_PREFIX_HEADER"];
+			string path = string("/") + settings->fields["GCC_PREFIX_HEADER"].value;
 			if (path.length()) {
 				_old_path.push_back(path);
 				_new_path.push_back(path);
@@ -139,7 +139,7 @@ bool pbx_processer::is_isa(object_t *object, string isa)
 	
 	object_map_t *info = dynamic_cast<object_map_t*>(object);
 	if (info) {
-		return (info->fields["isa"] == isa);
+		return (info->fields["isa"].value == isa);
 	}
 	
 	return false;

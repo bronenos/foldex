@@ -17,41 +17,27 @@ using namespace std;
 
 class object_t {
 public:
-	enum {
-		ot_int,
-		ot_string,
-		ot_array,
-		ot_map
-	} type;
-	
-	object_t() {
-		type = ot_string;
-	}
-	
 	virtual ~object_t() {
 	}
 };
 
 
+class field_t {
+public:
+	std::string value;
+	object_t *object;
+};
+
+
 class object_map_t : public object_t {
 public:
-	object_map_t() {
-		type = ot_map;
-	}
-	
-	map<string, string> fields;
-	map<string, object_t*> children;
+	map<string, field_t> fields;
 };
 
 
 class object_array_t : public object_t {
 public:
-	object_array_t() {
-		type = ot_array;
-	}
-	
-	vector<string> fields;
-	vector<object_t*> children;
+	vector<field_t> fields;
 };
 
 
@@ -61,20 +47,25 @@ public:
 	}
 	
 	object_map_t* objects() {
-		object_map_t *objects = dynamic_cast<object_map_t*>(child);
+		object_map_t *root_map = dynamic_cast<object_map_t*>(root);
+		object_map_t *objects = dynamic_cast<object_map_t*>(root_map->fields["objects"].object);
 		return objects;
 	}
 	
 	object_t* object_by_id(string id) {
-		return objects()->children[id];
+		return objects()->fields[id].object;
 	}
 	
 	vector<object_t*> objects_by_isa(string isa) {
 		vector<object_t*> ret;
 		
-		for (auto it : objects()->children) {
-			object_map_t *info = dynamic_cast<object_map_t*>(it.second);
-			if (info->fields["isa"] == isa) {
+		for (auto it : objects()->fields) {
+			if (it.second.object == nullptr) {
+				continue;
+			}
+			
+			object_map_t *info = dynamic_cast<object_map_t*>(it.second.object);
+			if (info->fields["isa"].value == isa) {
 				ret.push_back(info);
 			}
 		}
@@ -84,11 +75,7 @@ public:
 	
 public:
 	string comment;
-	string archive_version;
-	string object_version;
-	object_map_t classes;
-	object_t *child;
-	string rootRef;
+	object_t *root;
 };
 
 #endif

@@ -42,10 +42,7 @@ project_t* pbx_reader::parse()
 		
 		project_t *proj = new project_t;
 		proj->comment = comment;
-		proj->archive_version = obj->fields["archiveVersion"];
-		proj->object_version = obj->fields["objectVersion"];
-		proj->rootRef = obj->fields["rootObject"];
-		proj->child = obj->children["objects"];
+		proj->root = obj;
 		
 		return proj;
 	}
@@ -91,21 +88,19 @@ object_t* pbx_reader::parse_child()
 			}
 			
 			if (step_get_char() == '"') {
-				string value = parse_string();
-				obj->fields[key] = value;
+				obj->fields[key].value = parse_string();
 				
 				skip_space_and_comment();
 				find_delimiter();
 			}
 			else if (is_valid_path(step_get())) {
-				string value = parse_string();
-				obj->fields[key] = value;
+				obj->fields[key].value = parse_string();
 				
 				skip_space_and_comment();
 				find_delimiter();
 			}
 			else if (step_get_char() == '{' || step_get_char() == '(') {
-				obj->children[key] = parse_child();
+				obj->fields[key].object = parse_child();
 				
 				skip_space_and_comment();
 				find_delimiter();
@@ -131,21 +126,22 @@ object_t* pbx_reader::parse_child()
 			skip_space_and_comment();
 			
 			if (step_get_char() == '"') {
-				string value = parse_string();
-				obj->fields.push_back(value);
+				field_t field = { parse_string(), nullptr };
+				obj->fields.push_back(field);
 				
 				skip_space_and_comment();
 				find_delimiter();
 			}
 			else if (is_valid_path(step_get())) {
-				string value = parse_string();
-				obj->fields.push_back(value);
+				field_t field = { parse_string(), nullptr };
+				obj->fields.push_back(field);
 				
 				skip_space_and_comment();
 				find_delimiter();
 			}
 			else if (step_get_char() == '{' || step_get_char() == '(') {
-				obj->children.push_back(parse_child());
+				field_t field = { parse_string(), nullptr };
+				obj->fields.push_back(field);
 				
 				skip_space_and_comment();
 				find_delimiter();
