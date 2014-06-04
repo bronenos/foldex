@@ -147,13 +147,20 @@ bool pbx_processer::is_isa(object_t *object, string isa)
 
 string pbx_processer::path_without_last_component(string path, bool with_delimiter)
 {
+	static const char *path_up = "../";
+	static const size_t path_up_len = strlen(path_up);
+	
 	if (path.length() == 0) {
-		return "../";
+		return string(path_up);
+	}
+	
+	if (path.rfind(path_up) == path.length() - path_up_len) {
+		return path + string(path_up);
 	}
 	
 	string::size_type idx = path.rfind("/", path.length() - 2);
 	if (idx == string::npos) {
-		return "";
+		return string();
 	}
 	else {
 		if (with_delimiter) {
